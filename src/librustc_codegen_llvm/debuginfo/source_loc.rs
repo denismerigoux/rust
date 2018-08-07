@@ -17,6 +17,7 @@ use super::FunctionDebugContext;
 use llvm;
 use llvm::debuginfo::DIScope;
 use builder::Builder;
+use traits::BuilderMethods;
 
 use libc::c_uint;
 use syntax_pos::{Span, Pos};
@@ -82,7 +83,10 @@ impl InternalDebugLocation<'ll> {
     }
 }
 
-pub fn set_debug_location(bx: &Builder<'_, 'll, '_, &'ll Value>, debug_location: InternalDebugLocation<'ll>) {
+pub fn set_debug_location(
+    bx: &Builder<'_, 'll, '_, &'ll Value>,
+    debug_location: InternalDebugLocation<'ll>
+) {
     let metadata_node = match debug_location {
         KnownLocation { scope, line, col } => {
             // For MSVC, set the column number to zero.
