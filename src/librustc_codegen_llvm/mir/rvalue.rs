@@ -652,7 +652,7 @@ impl FunctionCx<'a, 'll, 'tcx> {
                                       op: mir::BinOp,
                                       lhs: &'ll Value,
                                       rhs: &'ll Value,
-                                      input_ty: Ty<'tcx>) -> OperandValue<'ll> {
+                                      input_ty: Ty<'tcx>) -> OperandValue<&'ll Value> {
         // This case can currently arise only from functions marked
         // with #[rustc_inherit_overflow_checks] and inlined from
         // another crate (mostly core::num generic/#[inline] fns),

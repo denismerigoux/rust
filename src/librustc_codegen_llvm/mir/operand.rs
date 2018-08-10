@@ -32,14 +32,14 @@ use super::place::PlaceRef;
 /// uniquely determined by the value's type, but is kept as a
 /// safety check.
 #[derive(Copy, Clone, Debug)]
-pub enum OperandValue<'ll> {
+pub enum OperandValue<Value> {
     /// A reference to the actual operand. The data is guaranteed
     /// to be valid for the operand's lifetime.
-    Ref(&'ll Value, Align),
+    Ref(Value, Align),
     /// A single LLVM value.
-    Immediate(&'ll Value),
+    Immediate(Value),
     /// A pair of immediate LLVM values. Used by fat pointers too.
-    Pair(&'ll Value, &'ll Value)
+    Pair(Value, Value)
 }
 
 /// An `OperandRef` is an "SSA" reference to a Rust value, along with
@@ -53,7 +53,7 @@ pub enum OperandValue<'ll> {
 #[derive(Copy, Clone)]
 pub struct OperandRef<'ll, 'tcx> {
     // The value.
-    pub val: OperandValue<'ll>,
+    pub val: OperandValue<&'ll Value>,
 
     // The layout of value, based on its Rust type.
     pub layout: TyLayout<'tcx>,
@@ -253,7 +253,7 @@ impl OperandRef<'ll, 'tcx> {
     }
 }
 
-impl OperandValue<'ll> {
+impl OperandValue<&'ll Value> {
     pub fn store(self, bx: &Builder<'a, 'll, 'tcx>, dest: PlaceRef<'ll, 'tcx>) {
         self.store_with_flags(bx, dest, MemFlags::empty());
     }
