@@ -32,7 +32,7 @@ use super::place::PlaceRef;
 /// uniquely determined by the value's type, but is kept as a
 /// safety check.
 #[derive(Copy, Clone, Debug)]
-pub enum OperandValue<Value> {
+pub enum OperandValueGeneral<Value> {
     /// A reference to the actual operand. The data is guaranteed
     /// to be valid for the operand's lifetime.
     Ref(Value, Align),
@@ -40,6 +40,17 @@ pub enum OperandValue<Value> {
     Immediate(Value),
     /// A pair of immediate LLVM values. Used by fat pointers too.
     Pair(Value, Value)
+}
+
+#[derive(Copy, Clone, Debug)]
+pub enum OperandValue<'ll> {
+    /// A reference to the actual operand. The data is guaranteed
+    /// to be valid for the operand's lifetime.
+    Ref(&'ll Value, Align),
+    /// A single LLVM value.
+    Immediate(&'ll Value),
+    /// A pair of immediate LLVM values. Used by fat pointers too.
+    Pair(&'ll Value, &'ll Value)
 }
 
 /// An `OperandRef` is an "SSA" reference to a Rust value, along with
@@ -53,10 +64,28 @@ pub enum OperandValue<Value> {
 #[derive(Copy, Clone)]
 pub struct OperandRef<'ll, 'tcx> {
     // The value.
-    pub val: OperandValue<&'ll Value>,
+    pub val: OperandValue<'ll>,
 
     // The layout of value, based on its Rust type.
     pub layout: TyLayout<'tcx>,
+}
+
+#[allow(dead_code)]
+pub fn gen_to_spec(x: OperandValueGeneral<&'ll Value>) -> OperandValue<'ll> {
+    match x {
+        OperandValueGeneral::Ref(a,b) => OperandValue::Ref(a,b),
+        OperandValueGeneral::Immediate(a) => OperandValue::Immediate(a),
+        OperandValueGeneral::Pair(a,b) => OperandValue::Pair(a,b),
+    }
+}
+
+#[allow(dead_code)]
+pub fn spec_to_gen(x : OperandValue<'ll>) -> OperandValueGeneral<&'ll Value> {
+    match x {
+        OperandValue::Ref(a,b) => OperandValueGeneral::Ref(a,b),
+        OperandValue::Immediate(a) => OperandValueGeneral::Immediate(a),
+        OperandValue::Pair(a,b) => OperandValueGeneral::Pair(a,b),
+    }
 }
 
 impl fmt::Debug for OperandRef<'ll, 'tcx> {
@@ -253,7 +282,7 @@ impl OperandRef<'ll, 'tcx> {
     }
 }
 
-impl OperandValue<&'ll Value> {
+impl OperandValue<'ll>  {
     pub fn store(self, bx: &Builder<'a, 'll, 'tcx>, dest: PlaceRef<'ll, 'tcx>) {
         self.store_with_flags(bx, dest, MemFlags::empty());
     }
