@@ -53,6 +53,28 @@ pub enum OperandValue<'ll> {
     Pair(&'ll Value, &'ll Value)
 }
 
+impl OperandValueGeneral<&'ll Value> {
+    #[allow(dead_code)]
+    pub fn to_spec(x: Self) -> OperandValue<'ll> {
+        match x {
+            OperandValueGeneral::Ref(a,b) => OperandValue::Ref(a,b),
+            OperandValueGeneral::Immediate(a) => OperandValue::Immediate(a),
+            OperandValueGeneral::Pair(a,b) => OperandValue::Pair(a,b),
+        }
+    }
+}
+
+impl OperandValue<'ll> {
+    #[allow(dead_code)]
+    pub fn to_gen(x : Self) -> OperandValueGeneral<&'ll Value> {
+        match x {
+            OperandValue::Ref(a,b) => OperandValueGeneral::Ref(a,b),
+            OperandValue::Immediate(a) => OperandValueGeneral::Immediate(a),
+            OperandValue::Pair(a,b) => OperandValueGeneral::Pair(a,b),
+        }
+    }
+}
+
 /// An `OperandRef` is an "SSA" reference to a Rust value, along with
 /// its type.
 ///
@@ -70,23 +92,6 @@ pub struct OperandRef<'ll, 'tcx> {
     pub layout: TyLayout<'tcx>,
 }
 
-#[allow(dead_code)]
-pub fn gen_to_spec(x: OperandValueGeneral<&'ll Value>) -> OperandValue<'ll> {
-    match x {
-        OperandValueGeneral::Ref(a,b) => OperandValue::Ref(a,b),
-        OperandValueGeneral::Immediate(a) => OperandValue::Immediate(a),
-        OperandValueGeneral::Pair(a,b) => OperandValue::Pair(a,b),
-    }
-}
-
-#[allow(dead_code)]
-pub fn spec_to_gen(x : OperandValue<'ll>) -> OperandValueGeneral<&'ll Value> {
-    match x {
-        OperandValue::Ref(a,b) => OperandValueGeneral::Ref(a,b),
-        OperandValue::Immediate(a) => OperandValueGeneral::Immediate(a),
-        OperandValue::Pair(a,b) => OperandValueGeneral::Pair(a,b),
-    }
-}
 
 impl fmt::Debug for OperandRef<'ll, 'tcx> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -284,21 +289,23 @@ impl OperandRef<'ll, 'tcx> {
 
 impl OperandValue<'ll>  {
     pub fn store(self, bx: &Builder<'a, 'll, 'tcx>, dest: PlaceRef<'ll, 'tcx>) {
-        self.store_with_flags(bx, dest, MemFlags::empty());
+        OperandValue::to_gen(self).store_with_flags(bx, dest, MemFlags::empty());
     }
 
     pub fn volatile_store(self, bx: &Builder<'a, 'll, 'tcx>, dest: PlaceRef<'ll, 'tcx>) {
-        self.store_with_flags(bx, dest, MemFlags::VOLATILE);
+        OperandValue::to_gen(self).store_with_flags(bx, dest, MemFlags::VOLATILE);
     }
 
     pub fn unaligned_volatile_store(self, bx: &Builder<'a, 'll, 'tcx>, dest: PlaceRef<'ll, 'tcx>) {
-        self.store_with_flags(bx, dest, MemFlags::VOLATILE | MemFlags::UNALIGNED);
+        OperandValue::to_gen(self).store_with_flags(bx, dest, MemFlags::VOLATILE | MemFlags::UNALIGNED);
     }
 
     pub fn nontemporal_store(self, bx: &Builder<'a, 'll, 'tcx>, dest: PlaceRef<'ll, 'tcx>) {
-        self.store_with_flags(bx, dest, MemFlags::NONTEMPORAL);
+        OperandValue::to_gen(self).store_with_flags(bx, dest, MemFlags::NONTEMPORAL);
     }
+}
 
+impl OperandValueGeneral<&'ll Value>  {
     fn store_with_flags(
         self,
         bx: &Builder<'a, 'll, 'tcx>,
@@ -312,15 +319,15 @@ impl OperandValue<'ll>  {
             return;
         }
         match self {
-            OperandValue::Ref(r, source_align) => {
+            OperandValueGeneral::Ref(r, source_align) => {
                 base::memcpy_ty(bx, dest.llval, r, dest.layout,
                                 source_align.min(dest.align), flags)
             }
-            OperandValue::Immediate(s) => {
+            OperandValueGeneral::Immediate(s) => {
                 let val = base::from_immediate(bx, s);
                 bx.store_with_flags(val, dest.llval, dest.align, flags);
             }
-            OperandValue::Pair(a, b) => {
+            OperandValueGeneral::Pair(a, b) => {
                 for (i, &x) in [a, b].iter().enumerate() {
                     let llptr = bx.struct_gep(dest.llval, i as u64);
                     let val = base::from_immediate(bx, x);
