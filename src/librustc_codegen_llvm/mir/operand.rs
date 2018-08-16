@@ -297,15 +297,47 @@ impl OperandValue<'ll>  {
     }
 
     pub fn unaligned_volatile_store(self, bx: &Builder<'a, 'll, 'tcx>, dest: PlaceRef<'ll, 'tcx>) {
-        OperandValue::to_gen(self).store_with_flags(bx, dest, MemFlags::VOLATILE | MemFlags::UNALIGNED);
+        self.store_with_flags(bx, dest, MemFlags::VOLATILE | MemFlags::UNALIGNED);
     }
 
     pub fn nontemporal_store(self, bx: &Builder<'a, 'll, 'tcx>, dest: PlaceRef<'ll, 'tcx>) {
-        OperandValue::to_gen(self).store_with_flags(bx, dest, MemFlags::NONTEMPORAL);
+        self.store_with_flags(bx, dest, MemFlags::NONTEMPORAL);
     }
 }
 
 impl OperandValueGeneral<&'ll Value>  {
+    pub fn store_with_flags(self,
+        bx: &Builder<'a, 'll, 'tcx>,
+        dest: PlaceRef<'ll, 'tcx>,
+        flags: MemFlags
+    ) {
+        debug!("OperandRef::store: operand={:?}, dest={:?}", self, dest);
+        // Avoid generating stores of zero-sized values, because the only way to have a zero-sized
+        // value is through `undef`, and store itself is useless.
+        if dest.layout.is_zst() {
+            return;
+        }
+        match self {
+            OperandValueGeneral::Ref(r,source_align) => {
+                base::memcpy_ty(bx, dest.llval, r, dest.layout,
+                                source_align.min(dest.align), flags)
+            },
+            OperandValueGeneral::Immediate(s) => {
+                let val = base::from_immediate(bx, s);
+                bx.store_with_flags(val, dest.llval, dest.align, flags);
+            }
+            OperandValueGeneral::Pair(a,b) => {
+                for (i, &x) in [a, b].iter().enumerate() {
+                    let llptr = bx.struct_gep(dest.llval, i as u64);
+                    let val = base::from_immediate(bx, x);
+                    bx.store_with_flags(val, llptr, dest.align, flags);
+                }
+            }
+        }
+    }
+}
+
+impl OperandValue<'ll>  {
     fn store_with_flags(
         self,
         bx: &Builder<'a, 'll, 'tcx>,
@@ -319,15 +351,15 @@ impl OperandValueGeneral<&'ll Value>  {
             return;
         }
         match self {
-            OperandValueGeneral::Ref(r, source_align) => {
+            OperandValue::Ref(r, source_align) => {
                 base::memcpy_ty(bx, dest.llval, r, dest.layout,
                                 source_align.min(dest.align), flags)
             }
-            OperandValueGeneral::Immediate(s) => {
+            OperandValue::Immediate(s) => {
                 let val = base::from_immediate(bx, s);
                 bx.store_with_flags(val, dest.llval, dest.align, flags);
             }
-            OperandValueGeneral::Pair(a, b) => {
+            OperandValue::Pair(a, b) => {
                 for (i, &x) in [a, b].iter().enumerate() {
                     let llptr = bx.struct_gep(dest.llval, i as u64);
                     let val = base::from_immediate(bx, x);
