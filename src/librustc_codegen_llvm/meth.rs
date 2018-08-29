@@ -96,7 +96,7 @@ pub fn get_vtable(
     }
 
     // Not in the cache. Build it.
-    let nullptr = CodegenCx::c_null(Type::i8p(cx));
+    let nullptr = cx.c_null(Type::i8p(cx));
 
     let (size, align) = cx.size_and_align_of(ty);
     let mut components: Vec<_> = [
