@@ -46,7 +46,7 @@ impl<'a, 'tcx> VirtualIndex {
         );
         let ptr_align = bx.tcx().data_layout.pointer_align;
         let ptr = bx.load(
-            bx.inbounds_gep(llvtable, &[bx.cx().c_usize(self.0)]),
+            bx.inbounds_gep(llvtable, &[bx.cx().const_usize(self.0)]),
             ptr_align
         );
         bx.nonnull_metadata(ptr);
@@ -66,7 +66,7 @@ impl<'a, 'tcx> VirtualIndex {
         let llvtable = bx.pointercast(llvtable, bx.cx().ptr_to(bx.cx().isize()));
         let usize_align = bx.tcx().data_layout.pointer_align;
         let ptr = bx.load(
-            bx.inbounds_gep(llvtable, &[bx.cx().c_usize(self.0)]),
+            bx.inbounds_gep(llvtable, &[bx.cx().const_usize(self.0)]),
             usize_align
         );
         // Vtable loads are invariant
@@ -98,13 +98,13 @@ pub fn get_vtable(
     }
 
     // Not in the cache. Build it.
-    let nullptr = cx.c_null(cx.i8p());
+    let nullptr = cx.const_null(cx.i8p());
 
     let (size, align) = cx.size_and_align_of(ty);
     let mut components: Vec<_> = [
         callee::get_fn(cx, monomorphize::resolve_drop_in_place(cx.tcx, ty)),
-        cx.c_usize(size.bytes()),
-        cx.c_usize(align.abi())
+        cx.const_usize(size.bytes()),
+        cx.const_usize(align.abi())
     ].iter().cloned().collect();
 
     if let Some(trait_ref) = trait_ref {
@@ -118,7 +118,7 @@ pub fn get_vtable(
         components.extend(methods);
     }
 
-    let vtable_const = cx.c_struct(&components, false);
+    let vtable_const = cx.const_struct(&components, false);
     let align = cx.data_layout().pointer_align;
     let vtable = consts::addr_of(cx, vtable_const, align, Some("vtable"));
 
