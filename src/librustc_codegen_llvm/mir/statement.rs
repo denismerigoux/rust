@@ -10,18 +10,20 @@
 
 use rustc::mir;
 
-use asm;
-use builder::Builder;
-
 use super::FunctionCx;
 use super::LocalRef;
-use value::Value;
+use rustc::ty::Ty;
+use rustc::ty::layout::{TyLayout, HasTyCtxt, LayoutOf};
+use interfaces::*;
 
-impl FunctionCx<'a, 'll, 'tcx, &'ll Value> {
-    pub fn codegen_statement(&mut self,
-                           bx: Builder<'a, 'll, 'tcx, &'ll Value>,
-                           statement: &mir::Statement<'tcx>)
-                           -> Builder<'a, 'll, 'tcx, &'ll Value> {
+impl<'a, 'll: 'a, 'tcx: 'll, Cx: CodegenMethods<'ll, 'tcx>> FunctionCx<'a, 'll, 'tcx, Cx>
+    where &'a Cx: LayoutOf<Ty = Ty<'tcx>, TyLayout = TyLayout<'tcx>> + HasTyCtxt<'tcx>
+{
+    pub fn codegen_statement<Bx: BuilderMethods<'a, 'll, 'tcx, CodegenCx=Cx>>(
+        &mut self,
+        bx: Bx,
+        statement: &mir::Statement<'tcx>
+    ) -> Bx {
         debug!("codegen_statement(statement={:?})", statement);
 
         self.set_debug_loc(&bx, statement.source_info);
@@ -89,7 +91,7 @@ impl FunctionCx<'a, 'll, 'tcx, &'ll Value> {
 
                 let res = asm::codegen_inline_asm(&bx, asm, outputs, input_vals);
                 if !res {
-                    span_err!(bx.sess(), statement.source_info.span, E0668,
+                    span_err!(bx.cx.sess(), statement.source_info.span, E0668,
                               "malformed inline assembly");
                 }
                 bx
