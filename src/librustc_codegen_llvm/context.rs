@@ -310,7 +310,7 @@ impl<'a, 'tcx, Value : Eq+Hash> CodegenCx<'a, 'tcx, Value> {
     }
 }
 
-impl MiscMethods<'tcx> for CodegenCx<'ll, 'tcx, &'ll Value> {
+impl MiscMethods<'ll, 'tcx> for CodegenCx<'ll, 'tcx, &'ll Value> {
     fn vtables(&self) -> &RefCell<FxHashMap<(Ty<'tcx>,
                                 Option<ty::PolyExistentialTraitRef<'tcx>>), &'ll Value>>
     {
@@ -416,7 +416,7 @@ impl MiscMethods<'tcx> for CodegenCx<'ll, 'tcx, &'ll Value> {
 
 impl<'ll, 'tcx: 'll> CodegenMethods<'ll, 'tcx> for CodegenCx<'ll, 'tcx, &'ll Value> {}
 
-impl IntrinsicDeclarationMethods for CodegenCx<'b, 'tcx, &'b Value> {
+impl IntrinsicDeclarationMethods<'b> for CodegenCx<'b, 'tcx, &'b Value> {
     fn get_intrinsic(&self, key: &str) -> &'b Value {
         if let Some(v) = self.intrinsics.borrow().get(key).cloned() {
             return v;
