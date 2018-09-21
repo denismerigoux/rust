@@ -16,7 +16,7 @@ use rustc::ty::Ty;
 use rustc::ty::layout::{TyLayout, HasTyCtxt, LayoutOf};
 use interfaces::*;
 
-impl<'a, 'll: 'a, 'tcx: 'll, Cx: CodegenMethods<'ll, 'tcx>> FunctionCx<'a, 'll, 'tcx, Cx>
+impl<'a, 'f, 'll: 'a + 'f, 'tcx: 'll, Cx: CodegenMethods<'ll, 'tcx>> FunctionCx<'a, 'f, 'll, 'tcx, Cx>
     where &'a Cx: LayoutOf<Ty = Ty<'tcx>, TyLayout = TyLayout<'tcx>> + HasTyCtxt<'tcx>
 {
     pub fn codegen_statement<Bx: BuilderMethods<'a, 'll, 'tcx, CodegenCx=Cx>>(
