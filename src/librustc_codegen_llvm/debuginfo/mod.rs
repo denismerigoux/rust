@@ -364,14 +364,10 @@ impl<'ll, 'tcx: 'll> DebugInfoMethods<'ll, 'tcx> for CodegenCx<'ll, 'tcx, &'ll V
             }
             None => {}
         };
-        if self.layout_of(sig.output()).abi == ty::layout::Abi::Uninhabited {
+
+        if self.layout_of(sig.output()).abi.is_uninhabited() {
             flags = flags | DIFlags::FlagNoReturn;
         }
-        None => {}
-    };
-    if cx.layout_of(sig.output()).abi.is_uninhabited() {
-        flags = flags | DIFlags::FlagNoReturn;
-    }
 
         let fn_metadata = unsafe {
             llvm::LLVMRustDIBuilderCreateFunction(
