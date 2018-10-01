@@ -362,7 +362,7 @@ impl<'ll, 'tcx: 'll> DebugInfoMethods<'ll, 'tcx> for CodegenCx<'ll, 'tcx, &'ll V
             None => {}
         };
 
-        if self.layout_of(sig.output()).abi.is_uninhabited() {
+        if self.layout_of(sig.output()).abi == layout::Abi::Uninhabited {
             flags = flags | DIFlags::FlagNoReturn;
         }
 
