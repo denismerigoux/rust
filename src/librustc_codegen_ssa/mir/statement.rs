@@ -22,12 +22,12 @@ impl<'a, 'f, 'll: 'a + 'f, 'tcx: 'll, Cx: CodegenMethods<'ll, 'tcx>>
 {
     pub fn codegen_statement<Bx: BuilderMethods<'a, 'll, 'tcx, CodegenCx=Cx>>(
         &mut self,
-        bx: Bx,
+        mut bx: Bx,
         statement: &mir::Statement<'tcx>
     ) -> Bx {
         debug!("codegen_statement(statement={:?})", statement);
 
-        self.set_debug_loc(&bx, statement.source_info);
+        self.set_debug_loc(&mut bx, statement.source_info);
         match statement.kind {
             mir::StatementKind::Assign(ref place, ref rvalue) => {
                 if let mir::Place::Local(index) = *place {
@@ -56,38 +56,38 @@ impl<'a, 'f, 'll: 'a + 'f, 'tcx: 'll, Cx: CodegenMethods<'ll, 'tcx>>
                         }
                     }
                 } else {
-                    let cg_dest = self.codegen_place(&bx, place);
+                    let cg_dest = self.codegen_place(&mut bx, place);
                     self.codegen_rvalue(bx, cg_dest, rvalue)
                 }
             }
             mir::StatementKind::SetDiscriminant{ref place, variant_index} => {
-                self.codegen_place(&bx, place)
-                    .codegen_set_discr(&bx, variant_index);
+                self.codegen_place(&mut bx, place)
+                    .codegen_set_discr(&mut bx, variant_index);
                 bx
             }
             mir::StatementKind::StorageLive(local) => {
                 if let LocalRef::Place(cg_place) = self.locals[local] {
-                    cg_place.storage_live(&bx);
+                    cg_place.storage_live(&mut bx);
                 } else if let LocalRef::UnsizedPlace(cg_indirect_place) = self.locals[local] {
-                    cg_indirect_place.storage_live(&bx);
+                    cg_indirect_place.storage_live(&mut bx);
                 }
                 bx
             }
             mir::StatementKind::StorageDead(local) => {
                 if let LocalRef::Place(cg_place) = self.locals[local] {
-                    cg_place.storage_dead(&bx);
+                    cg_place.storage_dead(&mut bx);
                 } else if let LocalRef::UnsizedPlace(cg_indirect_place) = self.locals[local] {
-                    cg_indirect_place.storage_dead(&bx);
+                    cg_indirect_place.storage_dead(&mut bx);
                 }
                 bx
             }
             mir::StatementKind::InlineAsm { ref asm, ref outputs, ref inputs } => {
                 let outputs = outputs.iter().map(|output| {
-                    self.codegen_place(&bx, output)
+                    self.codegen_place(&mut bx, output)
                 }).collect();
 
                 let input_vals = inputs.iter().map(|input| {
-                    self.codegen_operand(&bx, input).immediate()
+                    self.codegen_operand(&mut bx, input).immediate()
                 }).collect();
 
                 let res = bx.codegen_inline_asm(asm, outputs, input_vals);
