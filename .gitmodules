@@ -65,6 +65,3 @@
 	url = https://github.com/rust-lang-nursery/clang.git
 	branch = rust-release-80-v1
   
-[submodule "src/cranelift"]
-	path = src/cranelift
-	url = https://github.com/CraneStation/cranelift

@@ -13,3 +13,4 @@ test = false
 rustc = { path = "../librustc" }
 rustc_codegen_utils = { path = "../librustc_codegen_utils" }
 syntax_pos = { path = "../libsyntax_pos" }
+cranelift = "0.22.0"

@@ -13,6 +13,7 @@
 extern crate rustc;
 extern crate rustc_codegen_utils;
 extern crate syntax_pos;
+extern crate cranelift;
 
 use syntax_pos::symbol::Symbol;
 use rustc::ty::{self, TyCtxt};
