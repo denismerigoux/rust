@@ -1,0 +1,15 @@
+[package]
+authors = ["The Rust Project Developers"]
+name = "rustc_codegen_cranelift"
+version = "0.0.0"
+
+[lib]
+name = "rustc_codegen_cranelift"
+path = "lib.rs"
+crate-type = ["dylib"]
+test = false
+
+[dependencies]
+rustc = { path = "../librustc" }
+rustc_codegen_utils = { path = "../librustc_codegen_utils" }
+syntax_pos = { path = "../libsyntax_pos" }
