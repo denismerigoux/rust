@@ -10,13 +10,16 @@
 
 use rustc_codegen_ssa::interfaces::*;
 use rustc_codegen_ssa::common::TypeKind;
-use rustc::ty::{Ty, TyCtxt};
+use rustc::ty::{self, Ty, TyCtxt};
+use rustc::ty::layout::{TyLayout, LayoutOf, LayoutError, HasTyCtxt, HasDataLayout,
+    TargetDataLayout};
+use rustc_target::abi::call::{FnType, Reg, CastTarget};
 use super::context::{CraneliftContext, CrType, CrValue};
 use rustc_data_structures::fx::FxHashMap;
 
 use std::cell::RefCell;
 
-impl<'ll, 'tcx: 'll> BaseTypeMethods<'ll, 'tcx> for CraneliftContext {
+impl<'ll, 'tcx: 'll> BaseTypeMethods<'ll, 'tcx> for CraneliftContext<'tcx> {
     fn type_void(&self) -> CrType  {
         unimplemented!()
     }
@@ -118,3 +121,65 @@ impl<'ll, 'tcx: 'll> BaseTypeMethods<'ll, 'tcx> for CraneliftContext {
         unimplemented!()
     }
 }
+
+impl<'ll, 'tcx: 'll> LayoutTypeMethods<'ll, 'tcx> for CraneliftContext<'tcx> {
+    fn backend_type(&self, _ty: &TyLayout<'tcx>) -> CrType {
+        unimplemented!()
+    }
+    fn cast_backend_type(&self, _ty: &CastTarget) -> CrType {
+        unimplemented!()
+    }
+    fn fn_backend_type(&self, _ty: &FnType<'tcx, Ty<'tcx>>) -> CrType {
+        unimplemented!()
+    }
+    fn reg_backend_type(&self, _ty: &Reg) -> CrType {
+        unimplemented!()
+    }
+    fn immediate_backend_type(&self, _ty: &TyLayout<'tcx>) -> CrType {
+        unimplemented!()
+    }
+    fn is_backend_immediate(&self, _ty: &TyLayout<'tcx>) -> bool {
+        unimplemented!()
+    }
+    fn is_backend_scalar_pair(&self, _ty: &TyLayout<'tcx>) -> bool {
+        unimplemented!()
+    }
+    fn backend_field_index(&self, _ty: &TyLayout<'tcx>, _index: usize) -> u64 {
+        unimplemented!()
+    }
+    fn scalar_pair_element_backend_type<'a>(
+        &self,
+        _ty: &TyLayout<'tcx>,
+        _index: usize,
+        _immediate: bool
+    ) -> CrType{
+        unimplemented!()
+    }
+}
+
+impl<'a, 'tcx: 'a> HasDataLayout for &'a CraneliftContext<'tcx> {
+    fn data_layout(&self) -> &TargetDataLayout {
+        &self.tcx().data_layout
+    }
+}
+
+impl<'a, 'tcx: 'a> HasTyCtxt<'tcx> for &'a CraneliftContext<'tcx> {
+    fn tcx<'b>(&'b self) -> TyCtxt<'b, 'tcx, 'tcx> {
+        unimplemented!()
+    }
+}
+
+impl<'a, 'tcx: 'a> LayoutOf for &'a CraneliftContext<'tcx> {
+    type Ty = Ty<'tcx>;
+    type TyLayout = TyLayout<'tcx>;
+
+    fn layout_of(self, ty: Ty<'tcx>) -> Self::TyLayout {
+        self.tcx().layout_of(ty::ParamEnv::reveal_all().and(ty))
+            .unwrap_or_else(|e| match e {
+                LayoutError::SizeOverflow(_) => self.sess().fatal(&e.to_string()),
+                _ => bug!("failed to get layout for `{}`: {}", ty, e)
+            })
+    }
+}
+
+impl<'a, 'll: 'a, 'tcx: 'll> DerivedTypeMethods<'a, 'll, 'tcx> for CraneliftContext<'tcx> {}

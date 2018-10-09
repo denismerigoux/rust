@@ -9,19 +9,26 @@
 // except according to those terms.
 
 #![feature(box_syntax)]
+#![feature(libc)]
 
-extern crate rustc;
+#[macro_use] extern crate rustc;
 extern crate rustc_codegen_utils;
 extern crate cranelift;
 extern crate rustc_target;
 extern crate rustc_data_structures;
 extern crate rustc_codegen_ssa;
 extern crate syntax_pos;
+extern crate libc;
 
 mod backend;
 mod context;
 mod consts;
 mod type_;
+mod misc;
+mod declare;
+mod intrinsic;
+mod statics;
+mod debuginfo;
 
 use rustc::ty::{self, TyCtxt};
 use rustc::session::{Session, config::{PrintRequest, OutputFilenames}, CompileIncomplete};

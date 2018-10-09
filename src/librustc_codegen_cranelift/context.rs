@@ -11,8 +11,12 @@
 use rustc_codegen_ssa::interfaces::{Backend, CodegenObject};
 use cranelift;
 
+use std::marker::PhantomData;
+
 #[allow(dead_code)]
-pub struct CraneliftContext {}
+pub struct CraneliftContext<'tcx> {
+    phantom: PhantomData<&'tcx ()>
+}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct CrValue(cranelift::prelude::Value);
@@ -23,7 +27,7 @@ pub struct CrType(cranelift::prelude::Type);
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct CrEbb(cranelift::prelude::Type);
 
-impl<'ll> Backend<'ll> for CraneliftContext {
+impl<'ll, 'tcx: 'll> Backend<'ll> for CraneliftContext<'tcx> {
     type Value = CrValue;
     type BasicBlock = CrEbb;
     type Type = CrType;
