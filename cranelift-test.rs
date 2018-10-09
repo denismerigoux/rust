@@ -1,3 +1,5 @@
+//Run with  `rustc +stage1 -Z codegen-backend=cranelift --out-dir build cranelift-test.rs`
+
 #![feature(no_core)]
 #![no_core]
 #![feature(lang_items)]

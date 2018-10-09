@@ -15,12 +15,20 @@ extern crate rustc_codegen_utils;
 extern crate cranelift;
 extern crate rustc_target;
 extern crate rustc_data_structures;
+extern crate rustc_codegen_ssa;
+extern crate syntax_pos;
+
+mod backend;
+mod context;
+mod consts;
+mod type_;
 
 use rustc::ty::{self, TyCtxt};
 use rustc::session::{Session, config::{PrintRequest, OutputFilenames}, CompileIncomplete};
 use rustc::middle::cstore::MetadataLoader;
 use rustc::dep_graph::DepGraph;
-use rustc_codegen_utils::codegen_backend::{CodegenBackend, NoLlvmMetadataLoader, MetadataOnlyCodegenBackend};
+use rustc_codegen_utils::codegen_backend::{CodegenBackend, NoLlvmMetadataLoader,
+    MetadataOnlyCodegenBackend};
 
 
 use std::sync::mpsc;
@@ -57,11 +65,12 @@ impl CodegenBackend for CraneliftCodegenBackend {
     }
 
     fn provide(&self, providers: &mut ty::query::Providers) {
-        // TODO: replace this dummy implementation
+        // FIXME: replace this dummy implementation
         MetadataOnlyCodegenBackend::new().provide(providers)
     }
 
     fn provide_extern(&self, providers: &mut ty::query::Providers) {
+        // FIXME: replace this dummy implementation
         MetadataOnlyCodegenBackend::new().provide_extern(providers)
     }
 
