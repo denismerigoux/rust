@@ -12,15 +12,16 @@
 
 extern crate rustc;
 extern crate rustc_codegen_utils;
-extern crate syntax_pos;
 extern crate cranelift;
+extern crate rustc_target;
+extern crate rustc_data_structures;
 
-use syntax_pos::symbol::Symbol;
 use rustc::ty::{self, TyCtxt};
 use rustc::session::{Session, config::{PrintRequest, OutputFilenames}, CompileIncomplete};
 use rustc::middle::cstore::MetadataLoader;
 use rustc::dep_graph::DepGraph;
-use rustc_codegen_utils::codegen_backend::CodegenBackend;
+use rustc_codegen_utils::codegen_backend::{CodegenBackend, NoLlvmMetadataLoader, MetadataOnlyCodegenBackend};
+
 
 use std::sync::mpsc;
 use std::any::Any;
@@ -36,7 +37,7 @@ impl CraneliftCodegenBackend {
 
 impl CodegenBackend for CraneliftCodegenBackend {
     fn init(&self, _sess: &Session) {
-        unimplemented!()
+
     }
 
     fn print(&self, _req: PrintRequest, _sess: &Session) {
@@ -51,24 +52,17 @@ impl CodegenBackend for CraneliftCodegenBackend {
         unimplemented!()
     }
 
-    fn diagnostics(&self) -> &[(&'static str, &'static str)] {
-        unimplemented!()
-    }
-
-    fn target_features(&self, _sess: &Session) -> Vec<Symbol> {
-        unimplemented!()
-    }
-
     fn metadata_loader(&self) -> Box<dyn MetadataLoader + Sync> {
-        unimplemented!()
+        box NoLlvmMetadataLoader
     }
 
-    fn provide(&self, _providers: &mut ty::query::Providers) {
-        unimplemented!()
+    fn provide(&self, providers: &mut ty::query::Providers) {
+        // TODO: replace this dummy implementation
+        MetadataOnlyCodegenBackend::new().provide(providers)
     }
 
-    fn provide_extern(&self, _providers: &mut ty::query::Providers) {
-        unimplemented!()
+    fn provide_extern(&self, providers: &mut ty::query::Providers) {
+        MetadataOnlyCodegenBackend::new().provide_extern(providers)
     }
 
     fn codegen_crate<'a, 'tcx>(
