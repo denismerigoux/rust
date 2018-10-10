@@ -20,8 +20,9 @@ use std::cell::RefCell;
 use std::sync::Arc;
 
 impl<'ll, 'tcx: 'll> MiscMethods<'ll, 'tcx> for CrContext<'tcx> {
-    fn vtables(&self) -> &RefCell<FxHashMap<(Ty<'tcx>,
-                                Option<ty::PolyExistentialTraitRef<'tcx>>), CrValue>> {
+    fn vtables(&self) -> &RefCell<
+        FxHashMap<(Ty<'tcx>, ty::PolyExistentialTraitRef<'tcx>), CrValue>
+    > {
         unimplemented!()
     }
     fn check_overflow(&self) -> bool{

@@ -33,14 +33,16 @@ impl ExtraBackendMethods for CraneliftCodegenBackend {
         unimplemented!()
     }
     fn new_metadata(&self, _sess: &Session, _mod_name: &str) -> Self::Metadata {
-        unimplemented!()
+        //FIXME: replace this dummy implementation
+        ()
     }
     fn write_metadata<'b, 'gcx>(
         &self,
-        _tcx: TyCtxt<'b, 'gcx, 'gcx>,
+        tcx: TyCtxt<'b, 'gcx, 'gcx>,
         _metadata: &Self::Metadata
     ) -> EncodedMetadata {
-        unimplemented!()
+        //FIXME: replace this dummy implementation
+        tcx.encode_metadata()
     }
     fn codegen_allocator(&self, _tcx: TyCtxt, _mods: &Self::Metadata, _kind: AllocatorKind) {
         unimplemented!()

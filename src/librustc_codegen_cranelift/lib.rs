@@ -33,16 +33,15 @@ mod debuginfo;
 mod abi;
 mod asm;
 mod builder;
+mod attributes;
 
 use rustc::ty::{self, TyCtxt};
 use rustc::session::{Session, config::{PrintRequest, OutputFilenames}, CompileIncomplete};
 use rustc::middle::cstore::MetadataLoader;
 use rustc::dep_graph::DepGraph;
-use rustc_codegen_utils::codegen_backend::{CodegenBackend, NoLlvmMetadataLoader,
-    MetadataOnlyCodegenBackend};
+use rustc_codegen_utils::codegen_backend::{CodegenBackend, NoLlvmMetadataLoader};
 
-
-use std::sync::mpsc;
+use std::sync::{mpsc, Arc};
 use std::any::Any;
 
 pub struct CraneliftCodegenBackend(());
@@ -77,20 +76,25 @@ impl CodegenBackend for CraneliftCodegenBackend {
 
     fn provide(&self, providers: &mut ty::query::Providers) {
         // FIXME: replace this dummy implementation
-        MetadataOnlyCodegenBackend::new().provide(providers)
+        rustc_codegen_utils::symbol_names::provide(providers);
+        rustc_codegen_ssa::base::provide(providers);
+        attributes::provide(providers);
+        providers.is_reachable_non_generic = |_tcx, _defid| true;
+        providers.exported_symbols = |_tcx, _crate| Arc::new(Vec::new());
     }
 
     fn provide_extern(&self, providers: &mut ty::query::Providers) {
         // FIXME: replace this dummy implementation
-        MetadataOnlyCodegenBackend::new().provide_extern(providers)
+        rustc_codegen_ssa::base::provide_extern(providers);
+        providers.is_reachable_non_generic = |_tcx, _defid| true;
     }
 
     fn codegen_crate<'a, 'tcx>(
         &self,
-        _tcx: TyCtxt<'a, 'tcx, 'tcx>,
-        _rx: mpsc::Receiver<Box<dyn Any + Send>>
+        tcx: TyCtxt<'a, 'tcx, 'tcx>,
+        rx: mpsc::Receiver<Box<dyn Any + Send>>
     ) -> Box<dyn Any> {
-        unimplemented!()
+        box rustc_codegen_ssa::base::codegen_crate(CraneliftCodegenBackend(()), tcx, rx)
     }
 
     fn join_codegen_and_link(
