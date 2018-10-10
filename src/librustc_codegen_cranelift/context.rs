@@ -8,13 +8,12 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use rustc_codegen_ssa::interfaces::{Backend, CodegenObject};
+use rustc_codegen_ssa::interfaces::*;
 use cranelift;
 
 use std::marker::PhantomData;
 
-#[allow(dead_code)]
-pub struct CraneliftContext<'tcx> {
+pub struct CrContext<'tcx> {
     phantom: PhantomData<&'tcx ()>
 }
 
@@ -27,12 +26,14 @@ pub struct CrType(cranelift::prelude::Type);
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct CrEbb(cranelift::prelude::Type);
 
-impl<'ll, 'tcx: 'll> Backend<'ll> for CraneliftContext<'tcx> {
+impl<'ll, 'tcx: 'll> Backend<'ll> for CrContext<'tcx> {
     type Value = CrValue;
     type BasicBlock = CrEbb;
     type Type = CrType;
     type Context = ();
 }
+
+impl<'a, 'll: 'a, 'tcx: 'll> CodegenMethods<'a, 'll, 'tcx> for CrContext<'tcx> {}
 
 impl<'ll> CodegenObject for CrValue {}
 

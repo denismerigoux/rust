@@ -11,11 +11,11 @@
 use rustc::ty::layout;
 use rustc_codegen_ssa::interfaces::*;
 use rustc_codegen_ssa::mir::place::PlaceRef;
-use super::context::{CrValue, CrType, CraneliftContext};
+use super::context::{CrValue, CrType, CrContext};
 use syntax_pos::symbol::LocalInternedString;
 use rustc::mir::interpret::{Scalar, Allocation};
 
-impl<'ll, 'tcx: 'll> ConstMethods<'ll, 'tcx> for CraneliftContext<'tcx> {
+impl<'ll, 'tcx: 'll> ConstMethods<'ll, 'tcx> for CrContext<'tcx> {
     // Constant constructors
 
     fn const_null(&self, _t: CrType) -> CrValue {

@@ -17,6 +17,7 @@ extern crate cranelift;
 extern crate rustc_target;
 extern crate rustc_data_structures;
 extern crate rustc_codegen_ssa;
+extern crate syntax;
 extern crate syntax_pos;
 extern crate libc;
 
@@ -29,6 +30,9 @@ mod declare;
 mod intrinsic;
 mod statics;
 mod debuginfo;
+mod abi;
+mod asm;
+mod builder;
 
 use rustc::ty::{self, TyCtxt};
 use rustc::session::{Session, config::{PrintRequest, OutputFilenames}, CompileIncomplete};

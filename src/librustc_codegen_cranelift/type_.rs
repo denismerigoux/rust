@@ -10,16 +10,18 @@
 
 use rustc_codegen_ssa::interfaces::*;
 use rustc_codegen_ssa::common::TypeKind;
+use rustc_codegen_ssa::mir::place::PlaceRef;
 use rustc::ty::{self, Ty, TyCtxt};
 use rustc::ty::layout::{TyLayout, LayoutOf, LayoutError, HasTyCtxt, HasDataLayout,
     TargetDataLayout};
-use rustc_target::abi::call::{FnType, Reg, CastTarget};
-use super::context::{CraneliftContext, CrType, CrValue};
+use rustc_target::abi::call::{FnType, Reg, CastTarget, ArgType};
+use super::context::{CrContext, CrType, CrValue};
+use super::builder::CrBuilder;
 use rustc_data_structures::fx::FxHashMap;
 
 use std::cell::RefCell;
 
-impl<'ll, 'tcx: 'll> BaseTypeMethods<'ll, 'tcx> for CraneliftContext<'tcx> {
+impl<'ll, 'tcx: 'll> BaseTypeMethods<'ll, 'tcx> for CrContext<'tcx> {
     fn type_void(&self) -> CrType  {
         unimplemented!()
     }
@@ -122,7 +124,7 @@ impl<'ll, 'tcx: 'll> BaseTypeMethods<'ll, 'tcx> for CraneliftContext<'tcx> {
     }
 }
 
-impl<'ll, 'tcx: 'll> LayoutTypeMethods<'ll, 'tcx> for CraneliftContext<'tcx> {
+impl<'ll, 'tcx: 'll> LayoutTypeMethods<'ll, 'tcx> for CrContext<'tcx> {
     fn backend_type(&self, _ty: &TyLayout<'tcx>) -> CrType {
         unimplemented!()
     }
@@ -157,19 +159,19 @@ impl<'ll, 'tcx: 'll> LayoutTypeMethods<'ll, 'tcx> for CraneliftContext<'tcx> {
     }
 }
 
-impl<'a, 'tcx: 'a> HasDataLayout for &'a CraneliftContext<'tcx> {
+impl<'a, 'tcx: 'a> HasDataLayout for &'a CrContext<'tcx> {
     fn data_layout(&self) -> &TargetDataLayout {
         &self.tcx().data_layout
     }
 }
 
-impl<'a, 'tcx: 'a> HasTyCtxt<'tcx> for &'a CraneliftContext<'tcx> {
+impl<'a, 'tcx: 'a> HasTyCtxt<'tcx> for &'a CrContext<'tcx> {
     fn tcx<'b>(&'b self) -> TyCtxt<'b, 'tcx, 'tcx> {
         unimplemented!()
     }
 }
 
-impl<'a, 'tcx: 'a> LayoutOf for &'a CraneliftContext<'tcx> {
+impl<'a, 'tcx: 'a> LayoutOf for &'a CrContext<'tcx> {
     type Ty = Ty<'tcx>;
     type TyLayout = TyLayout<'tcx>;
 
@@ -182,4 +184,27 @@ impl<'a, 'tcx: 'a> LayoutOf for &'a CraneliftContext<'tcx> {
     }
 }
 
-impl<'a, 'll: 'a, 'tcx: 'll> DerivedTypeMethods<'a, 'll, 'tcx> for CraneliftContext<'tcx> {}
+impl<'a, 'll: 'a, 'tcx: 'll> DerivedTypeMethods<'a, 'll, 'tcx> for CrContext<'tcx> {}
+
+impl<'a, 'll: 'a, 'tcx: 'll> TypeMethods<'a, 'll, 'tcx> for CrContext<'tcx> {}
+
+impl<'a, 'll: 'a, 'tcx: 'll>  ArgTypeMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'tcx> {
+    fn store_fn_arg(
+        &mut self,
+        _ty: &ArgType<'tcx, Ty<'tcx>>,
+        _idx: &mut usize, _dst: PlaceRef<'tcx, CrValue>
+    ) {
+        unimplemented!()
+    }
+    fn store_arg_ty(
+        &mut self,
+        _ty: &ArgType<'tcx, Ty<'tcx>>,
+        _val: CrValue,
+        _dst: PlaceRef<'tcx, CrValue>
+    ) {
+        unimplemented!()
+    }
+    fn memory_ty(&self, _ty: &ArgType<'tcx, Ty<'tcx>>) -> CrType {
+        unimplemented!()
+    }
+}

@@ -13,6 +13,7 @@ test = false
 rustc = { path = "../librustc" }
 rustc_codegen_utils = { path = "../librustc_codegen_utils" }
 syntax_pos = { path = "../libsyntax_pos" }
+syntax = { path = "../libsyntax" }
 rustc_codegen_ssa = { path = "../librustc_codegen_ssa" }
 rustc_data_structures = { path = "../librustc_data_structures" }
 rustc_target = { path = "../librustc_target" }

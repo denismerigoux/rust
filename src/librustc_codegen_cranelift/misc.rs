@@ -13,13 +13,13 @@ use rustc::ty::{self, Ty, Instance};
 use rustc::session::Session;
 use rustc::mir::mono::{Stats, CodegenUnit};
 use rustc_data_structures::fx::FxHashMap;
-use super::context::{CraneliftContext, CrValue};
+use super::context::{CrContext, CrValue};
 use libc::c_uint;
 
 use std::cell::RefCell;
 use std::sync::Arc;
 
-impl<'ll, 'tcx: 'll> MiscMethods<'ll, 'tcx> for CraneliftContext<'tcx> {
+impl<'ll, 'tcx: 'll> MiscMethods<'ll, 'tcx> for CrContext<'tcx> {
     fn vtables(&self) -> &RefCell<FxHashMap<(Ty<'tcx>,
                                 Option<ty::PolyExistentialTraitRef<'tcx>>), CrValue>> {
         unimplemented!()

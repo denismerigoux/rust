@@ -8,18 +8,24 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use super::context::{CraneliftContext, CrValue};
+use super::context::{CrContext, CrValue};
+use super::builder::CrBuilder;
 use rustc_codegen_ssa::interfaces::*;
 use rustc::mir;
 use syntax_pos;
+use syntax::ast::Name;
 use rustc::hir::def_id::CrateNum;
 use rustc::ty::{Ty, Instance, FnSig};
-use rustc_codegen_ssa::debuginfo::{MirDebugScope, FunctionDebugContext};
+use rustc_codegen_ssa::debuginfo::{MirDebugScope, FunctionDebugContext, VariableAccess,
+    VariableKind};
 use rustc_data_structures::indexed_vec::IndexVec;
 
 
-impl<'ll, 'tcx: 'll> DebugInfoMethods<'ll, 'tcx>  for CraneliftContext<'tcx> {
-    type DIScope = ();
+type DIScope = ();
+
+
+impl<'ll, 'tcx: 'll> DebugInfoMethods<'ll, 'tcx>  for CrContext<'tcx> {
+    type DIScope = DIScope;
 
     fn create_vtable_metadata(
         &self,
@@ -58,6 +64,33 @@ impl<'ll, 'tcx: 'll> DebugInfoMethods<'ll, 'tcx>  for CraneliftContext<'tcx> {
         unimplemented!()
     }
     fn debuginfo_upvar_decls_ops_sequence(&self, _byte_offset_of_var_in_env: u64) -> [i64; 4] {
+        unimplemented!()
+    }
+}
+
+
+impl<'a, 'll: 'a, 'tcx: 'll> DebugInfoBuilderMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'tcx> {
+    fn declare_local(
+        &mut self,
+        _dbg_context: &FunctionDebugContext<DIScope>,
+        _variable_name: Name,
+        _variable_type: Ty<'tcx>,
+        _scope_metadata: DIScope,
+        _variable_access: VariableAccess<'_, CrValue>,
+        _variable_kind: VariableKind,
+        _span: syntax_pos::Span,
+    ) {
+        unimplemented!()
+    }
+    fn set_source_location(
+        &mut self,
+        _debug_context: &FunctionDebugContext<DIScope>,
+        _scope: Option<DIScope>,
+        _span: syntax_pos::Span,
+    ) {
+        unimplemented!()
+    }
+    fn insert_reference_to_gdb_debug_scripts_section_global(&mut self) {
         unimplemented!()
     }
 }
