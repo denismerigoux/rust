@@ -43,6 +43,6 @@ happen when trying to pass in a slice, for instance a `&str`. In Rust, these
 values are represented internally as a pair of values, the pointer and its
 length. When passed as an input operand, this pair of values can not be
 coerced into a register and thus we must fail with an error.
-"##,
+"##
 
 }

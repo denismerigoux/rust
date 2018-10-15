@@ -12,6 +12,7 @@
 #![feature(libc)]
 
 #[macro_use] extern crate rustc;
+extern crate rustc_errors;
 extern crate rustc_codegen_utils;
 extern crate cranelift;
 extern crate rustc_target;
@@ -34,6 +35,7 @@ mod abi;
 mod asm;
 mod builder;
 mod attributes;
+mod write;
 
 use rustc::ty::{self, TyCtxt};
 use rustc::session::{Session, config::{PrintRequest, OutputFilenames}, CompileIncomplete};
@@ -44,6 +46,7 @@ use rustc_codegen_utils::codegen_backend::{CodegenBackend, NoLlvmMetadataLoader}
 use std::sync::{mpsc, Arc};
 use std::any::Any;
 
+#[derive(Clone)]
 pub struct CraneliftCodegenBackend(());
 
 impl CraneliftCodegenBackend {
