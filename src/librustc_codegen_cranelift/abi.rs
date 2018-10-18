@@ -14,9 +14,24 @@ use rustc_codegen_ssa::interfaces::*;
 use super::context::{CrContext, CrValue};
 use super::builder::CrBuilder;
 
+#[allow(unreachable_code, unused_variables)]
 impl<'ll, 'tcx: 'll> AbiMethods<'tcx> for CrContext<'ll, 'tcx> {
-    fn new_fn_type(&self, _sig: FnSig<'tcx>, _extra_args: &[Ty<'tcx>]) -> FnType<'tcx, Ty<'tcx>> {
-        unimplemented!()
+    fn new_fn_type(&self, sig: FnSig<'tcx>, _extra_args: &[Ty<'tcx>]) -> FnType<'tcx, Ty<'tcx>> {
+        FnType {
+            // /// The LLVM types of each argument.
+            // pub args: Vec<ArgType<'a, Ty>>,
+            //
+            // /// LLVM return type.
+            // pub ret: ArgType<'a, Ty>,
+            //
+            // pub variadic: bool,
+            //
+            // pub conv: Conv,
+            args: unimplemented!(),
+            ret: unimplemented!(),
+            variadic: sig.variadic,
+            conv: unimplemented!()
+        }
     }
     fn new_vtable(
         &self,

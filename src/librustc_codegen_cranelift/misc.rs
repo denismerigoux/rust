@@ -28,8 +28,8 @@ impl<'ll, 'tcx: 'll> MiscMethods<'ll, 'tcx> for CrContext<'ll, 'tcx> {
     fn check_overflow(&self) -> bool{
         unimplemented!()
     }
-    fn instances(&self) -> &RefCell<FxHashMap<Instance<'tcx>, CrValue>>{
-        unimplemented!()
+    fn instances(&self) -> &RefCell<FxHashMap<Instance<'tcx>, CrValue>> {
+        &self.instances
     }
     fn get_fn(&self, _instance: Instance<'tcx>) -> CrValue{
         unimplemented!()
@@ -44,16 +44,16 @@ impl<'ll, 'tcx: 'll> MiscMethods<'ll, 'tcx> for CrContext<'ll, 'tcx> {
         unimplemented!()
     }
     fn sess(&self) -> &Session{
-        unimplemented!()
+        &self.tcx.sess
     }
     fn stats(&self) -> &RefCell<Stats>{
-        unimplemented!()
+        &self.stats
     }
     fn consume_stats(self) -> RefCell<Stats>{
-        unimplemented!()
+        self.stats
     }
     fn codegen_unit(&self) -> &Arc<CodegenUnit<'tcx>>{
-        unimplemented!()
+        &self.codegen_unit
     }
     fn statics_to_rauw(&self) -> &RefCell<Vec<(CrValue, CrValue)>>{
         unimplemented!()

@@ -10,15 +10,21 @@
 
 use rustc_codegen_ssa::interfaces::*;
 use cranelift;
+use cranelift::prelude::codegen::entity::{PrimaryMap, EntityRef};
 use write::CrModule;
-use rustc::ty::TyCtxt;
-use rustc::mir::mono::CodegenUnit;
+use rustc::ty::{TyCtxt, Instance};
+use rustc::mir::mono::{CodegenUnit, Stats};
+use rustc_data_structures::fx::FxHashMap;
 
 use std::sync::Arc;
+use std::cell::RefCell;
 
 pub struct CrContext<'ll, 'tcx: 'll> {
-    pub(crate) tcx : TyCtxt<'ll, 'tcx, 'tcx>,
-    pub(crate) codegen_unit: Arc<CodegenUnit<'tcx>>
+    pub tcx : TyCtxt<'ll, 'tcx, 'tcx>,
+    pub codegen_unit: Arc<CodegenUnit<'tcx>>,
+    pub cr_instances: RefCell<PrimaryMap<CrInstance, ()>>,
+    pub instances: RefCell<FxHashMap<Instance<'tcx>, CrValue>>,
+    pub stats: RefCell<Stats>
 }
 
 impl<'ll, 'tcx: 'll> CrContext<'ll, 'tcx> {
@@ -29,13 +35,32 @@ impl<'ll, 'tcx: 'll> CrContext<'ll, 'tcx> {
     ) -> Self {
             CrContext {
                 tcx,
-                codegen_unit: cgu
+                codegen_unit: cgu,
+                cr_instances: RefCell::new(PrimaryMap::new()),
+                instances: RefCell::new(FxHashMap()),
+                stats: RefCell::new(Stats::default())
             }
         }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CrInstance(usize);
+
+impl EntityRef for CrInstance {
+    fn new(x : usize) -> Self {
+        CrInstance(x)
+    }
+    fn index(self) -> usize {
+        let CrInstance(v) = self;
+        v
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct CrValue(cranelift::prelude::Value);
+pub enum CrValue {
+    Value(cranelift::prelude::Value),
+    Instance(CrInstance)
+}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct CrType(cranelift::prelude::Type);

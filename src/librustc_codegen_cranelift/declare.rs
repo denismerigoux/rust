@@ -88,11 +88,13 @@ impl<'ll, 'tcx: 'll> PreDefineMethods<'ll, 'tcx> for CrContext<'ll, 'tcx> {
     }
     fn predefine_fn(
         &self,
-        _instance: Instance<'tcx>,
+        instance: Instance<'tcx>,
         _linkage: Linkage,
         _visibility: Visibility,
         _symbol_name: &str
     ) {
-        unimplemented!()
+        //FIXME: improve this dummy impl
+        let cr_instance = CrValue::Instance(self.cr_instances.borrow_mut().push(()));
+        self.instances.borrow_mut().insert(instance, cr_instance);
     }
 }

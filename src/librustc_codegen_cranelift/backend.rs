@@ -106,12 +106,6 @@ impl ExtraBackendMethods for CraneliftCodegenBackend {
                     cx.static_replace_all_uses(old_g, new_g)
                 }
 
-                // Create the llvm.used variable
-                // This variable has type [N x i8*] and is stored in the llvm.metadata section
-                if !cx.used_statics().borrow().is_empty() {
-                    cx.create_used_variable()
-                }
-
                 // Finalize debuginfo
                 if cx.sess().opts.debuginfo != DebugInfo::None {
                     cx.debuginfo_finalize();
