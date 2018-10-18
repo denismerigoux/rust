@@ -22,10 +22,12 @@ use syntax_pos::symbol::InternedString;
 
 impl ExtraBackendMethods for CraneliftCodegenBackend {
     fn thin_lto_available(&self) -> bool {
-        unimplemented!()
+        //FIXME: replace this dummy implementation
+        false
     }
     fn pgo_available(&self) -> bool {
-        unimplemented!()
+        //FIXME: replace this dummy implementation
+        false
     }
     fn new_metadata(&self, _sess: &Session, _mod_name: &str) -> Self::Module {
         //FIXME: replace this dummy implementation
@@ -56,7 +58,8 @@ impl ExtraBackendMethods for CraneliftCodegenBackend {
     ) -> Arc<dyn Fn() ->
         Result<TargetMachine, String> + Send + Sync>
     {
-        unimplemented!()
+        //FIXME: replace this dummy implementation
+        Arc::new(|| { Ok(TargetMachine()) })
     }
     fn target_cpu<'b>(&self, _sess: &'b Session) -> &'b str {
         unimplemented!()

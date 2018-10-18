@@ -17,7 +17,9 @@ use CraneliftCodegenBackend;
 use rustc::dep_graph::WorkProduct;
 use rustc::util::time_graph::Timeline;
 use rustc_errors::{FatalError, Handler};
+use rustc::session::config::OutputType;
 
+use std::fs;
 
 pub struct ThinBuffer();
 
@@ -81,7 +83,8 @@ impl WriteBackendMethods for CraneliftCodegenBackend {
         _config: &ModuleConfig,
         _timeline: &mut Timeline
     ) -> Result<(), FatalError> {
-        unimplemented!()
+        //FIXME: replace this dummy impl
+        Ok(())
     }
     unsafe fn optimize_thin(
         _cgcx: &CodegenContext<Self>,
@@ -91,12 +94,24 @@ impl WriteBackendMethods for CraneliftCodegenBackend {
         unimplemented!()
     }
     unsafe fn codegen(
-        _cgcx: &CodegenContext<Self>,
-        _diag_handler: &Handler,
-        _module: ModuleCodegen<Self::Module>,
-        _config: &ModuleConfig,
-        _timeline: &mut Timeline
+        cgcx: &CodegenContext<Self>,
+        diag_handler: &Handler,
+        module: ModuleCodegen<Self::Module>,
+        config: &ModuleConfig,
+        timeline: &mut Timeline
     ) -> Result<CompiledModule, FatalError> {
+        let module_name = module.name.clone();
+        let module_name = Some(&module_name[..]);
+        let bc_out = cgcx.output_filenames.temp_path(OutputType::Bitcode, module_name);
+        if !config.emit_bc {
+            return Err(FatalError)
+        }
+
+        if let Err(e) = fs::write(&bc_out, &[]) {
+            diag_handler.err(&format!("failed to write bytecode: {}", e));
+        }
+        timeline.record("write-bc");
+        println!("{:?}", bc_out);
         unimplemented!()
     }
     fn run_lto_pass_manager(
