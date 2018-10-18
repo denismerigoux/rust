@@ -38,12 +38,12 @@ impl ModuleBufferMethods for ModuleBuffer {
 }
 
 #[derive(Clone)]
-pub struct Module();
+pub struct CrModule();
 #[derive(Clone)]
 pub struct TargetMachine();
 
 impl WriteBackendMethods for CraneliftCodegenBackend {
-    type Module = Module;
+    type Module = CrModule;
     type ModuleBuffer = ModuleBuffer;
     type TargetMachine = TargetMachine;
     type Context = ();

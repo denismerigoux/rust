@@ -14,13 +14,13 @@ use super::context::{CrContext, CrValue};
 use super::builder::CrBuilder;
 use rustc::hir::{GlobalAsm, InlineAsm};
 
-impl<'tcx> AsmMethods for CrContext<'tcx> {
+impl<'ll, 'tcx: 'll> AsmMethods for CrContext<'ll, 'tcx> {
     fn codegen_global_asm(&self, _ga: &GlobalAsm) {
         unimplemented!()
     }
 }
 
-impl<'a, 'll: 'a, 'tcx: 'll> AsmBuilderMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'tcx> {
+impl<'a, 'll: 'a, 'tcx: 'll> AsmBuilderMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'll, 'tcx> {
     // Take an inline assembly expression and splat it out via LLVM
     fn codegen_inline_asm(
         &mut self,

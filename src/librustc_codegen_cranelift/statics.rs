@@ -13,7 +13,7 @@ use rustc::hir::def_id::DefId;
 use super::context::{CrContext, CrValue, CrType};
 use rustc_codegen_ssa::interfaces::*;
 
-impl<'ll, 'tcx: 'll> StaticMethods<'ll> for CrContext<'tcx> {
+impl<'ll, 'tcx: 'll> StaticMethods<'ll> for CrContext<'ll, 'tcx> {
     fn static_ptrcast(&self, _val: CrValue, _ty: CrType) -> CrValue {
         unimplemented!()
     }

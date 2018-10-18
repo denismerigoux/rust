@@ -25,16 +25,16 @@ use std::ops::Range;
 
 
 #[allow(dead_code)]
-pub struct CrBuilder<'a, 'tcx: 'a> {
-    cx: &'a CrContext<'tcx>
+pub struct CrBuilder<'a, 'll: 'a, 'tcx: 'll> {
+    cx: &'a CrContext<'ll, 'tcx>
 }
 
-impl<'a, 'll: 'a, 'tcx: 'll> HasCodegen<'a, 'll, 'tcx> for CrBuilder<'a, 'tcx> {
-    type CodegenCx = CrContext<'tcx>;
+impl<'a, 'll: 'a, 'tcx: 'll> HasCodegen<'a, 'll, 'tcx> for CrBuilder<'a, 'll, 'tcx> {
+    type CodegenCx = CrContext<'ll, 'tcx>;
 }
 
 
-impl<'a, 'll :'a, 'tcx: 'll> BuilderMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'tcx> {
+impl<'a, 'll :'a, 'tcx: 'll> BuilderMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'll, 'tcx> {
     fn new_block<'b>(
         _cx: &'a CrContext,
         _llfn: CrValue,
@@ -48,7 +48,7 @@ impl<'a, 'll :'a, 'tcx: 'll> BuilderMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'tc
     fn build_sibling_block<'b>(&self, _name: &'b str) -> Self {
         unimplemented!()
     }
-    fn cx(&self) -> &'a CrContext<'tcx> {
+    fn cx(&self) -> &'a CrContext<'ll, 'tcx> {
         &self.cx
     }
     fn tcx(&self) -> TyCtxt<'a, 'tcx, 'tcx> {

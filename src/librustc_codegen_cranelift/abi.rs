@@ -14,7 +14,7 @@ use rustc_codegen_ssa::interfaces::*;
 use super::context::{CrContext, CrValue};
 use super::builder::CrBuilder;
 
-impl<'tcx> AbiMethods<'tcx> for CrContext<'tcx> {
+impl<'ll, 'tcx: 'll> AbiMethods<'tcx> for CrContext<'ll, 'tcx> {
     fn new_fn_type(&self, _sig: FnSig<'tcx>, _extra_args: &[Ty<'tcx>]) -> FnType<'tcx, Ty<'tcx>> {
         unimplemented!()
     }
@@ -30,7 +30,7 @@ impl<'tcx> AbiMethods<'tcx> for CrContext<'tcx> {
     }
 }
 
-impl<'a, 'll: 'a, 'tcx: 'll> AbiBuilderMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'tcx> {
+impl<'a, 'll: 'a, 'tcx: 'll> AbiBuilderMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'll, 'tcx> {
     fn apply_attrs_callsite(
         &mut self,
         _ty: &FnType<'tcx, Ty<'tcx>>,

@@ -18,4 +18,5 @@ syntax = { path = "../libsyntax" }
 rustc_codegen_ssa = { path = "../librustc_codegen_ssa" }
 rustc_data_structures = { path = "../librustc_data_structures" }
 rustc_target = { path = "../librustc_target" }
+rustc_mir = { path = "../librustc_mir" }
 cranelift = "0.22.0"

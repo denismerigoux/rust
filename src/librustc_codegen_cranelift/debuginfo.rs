@@ -24,7 +24,7 @@ use rustc_data_structures::indexed_vec::IndexVec;
 type DIScope = ();
 
 
-impl<'ll, 'tcx: 'll> DebugInfoMethods<'ll, 'tcx>  for CrContext<'tcx> {
+impl<'ll, 'tcx: 'll> DebugInfoMethods<'ll, 'tcx>  for CrContext<'ll, 'tcx> {
     type DIScope = DIScope;
 
     fn create_vtable_metadata(
@@ -69,7 +69,7 @@ impl<'ll, 'tcx: 'll> DebugInfoMethods<'ll, 'tcx>  for CrContext<'tcx> {
 }
 
 
-impl<'a, 'll: 'a, 'tcx: 'll> DebugInfoBuilderMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'tcx> {
+impl<'a, 'll: 'a, 'tcx: 'll> DebugInfoBuilderMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'll, 'tcx> {
     fn declare_local(
         &mut self,
         _dbg_context: &FunctionDebugContext<DIScope>,

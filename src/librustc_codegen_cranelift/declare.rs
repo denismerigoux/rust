@@ -14,7 +14,7 @@ use rustc::hir::def_id::DefId;
 use rustc::mir::mono::{Linkage, Visibility};
 use super::context::{CrContext, CrValue, CrType};
 
-impl<'ll, 'tcx: 'll> DeclareMethods<'ll, 'tcx> for CrContext<'tcx> {
+impl<'ll, 'tcx: 'll> DeclareMethods<'ll, 'tcx> for CrContext<'ll, 'tcx> {
 
     fn declare_global(
         &self,
@@ -76,7 +76,7 @@ impl<'ll, 'tcx: 'll> DeclareMethods<'ll, 'tcx> for CrContext<'tcx> {
     }
 }
 
-impl<'ll, 'tcx: 'll> PreDefineMethods<'ll, 'tcx> for CrContext<'tcx> {
+impl<'ll, 'tcx: 'll> PreDefineMethods<'ll, 'tcx> for CrContext<'ll, 'tcx> {
     fn predefine_static(
         &self,
         _def_id: DefId,

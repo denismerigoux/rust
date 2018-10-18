@@ -10,11 +10,28 @@
 
 use rustc_codegen_ssa::interfaces::*;
 use cranelift;
+use write::CrModule;
+use rustc::ty::TyCtxt;
+use rustc::mir::mono::CodegenUnit;
 
-use std::marker::PhantomData;
+use std::sync::Arc;
 
-pub struct CrContext<'tcx> {
-    phantom: PhantomData<&'tcx ()>
+pub struct CrContext<'ll, 'tcx: 'll> {
+    pub(crate) tcx : TyCtxt<'ll, 'tcx, 'tcx>,
+    pub(crate) codegen_unit: Arc<CodegenUnit<'tcx>>
+}
+
+impl<'ll, 'tcx: 'll> CrContext<'ll, 'tcx> {
+    pub fn new(
+        tcx: TyCtxt<'ll, 'tcx, 'tcx>,
+        cgu: Arc<CodegenUnit<'tcx>>,
+        _cranelift_module: &CrModule
+    ) -> Self {
+            CrContext {
+                tcx,
+                codegen_unit: cgu
+            }
+        }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -26,14 +43,14 @@ pub struct CrType(cranelift::prelude::Type);
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct CrEbb(cranelift::prelude::Type);
 
-impl<'ll, 'tcx: 'll> Backend<'ll> for CrContext<'tcx> {
+impl<'ll, 'tcx: 'll> Backend<'ll> for CrContext<'ll, 'tcx> {
     type Value = CrValue;
     type BasicBlock = CrEbb;
     type Type = CrType;
     type Context = ();
 }
 
-impl<'a, 'll: 'a, 'tcx: 'll> CodegenMethods<'a, 'll, 'tcx> for CrContext<'tcx> {}
+impl<'a, 'll: 'a, 'tcx: 'll> CodegenMethods<'a, 'll, 'tcx> for CrContext<'ll, 'tcx> {}
 
 impl<'ll> CodegenObject for CrValue {}
 

@@ -19,7 +19,7 @@ use libc::c_uint;
 use std::cell::RefCell;
 use std::sync::Arc;
 
-impl<'ll, 'tcx: 'll> MiscMethods<'ll, 'tcx> for CrContext<'tcx> {
+impl<'ll, 'tcx: 'll> MiscMethods<'ll, 'tcx> for CrContext<'ll, 'tcx> {
     fn vtables(&self) -> &RefCell<
         FxHashMap<(Ty<'tcx>, ty::PolyExistentialTraitRef<'tcx>), CrValue>
     > {

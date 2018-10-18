@@ -21,6 +21,7 @@ extern crate rustc_codegen_ssa;
 extern crate syntax;
 extern crate syntax_pos;
 extern crate libc;
+extern crate rustc_mir;
 
 mod backend;
 mod context;

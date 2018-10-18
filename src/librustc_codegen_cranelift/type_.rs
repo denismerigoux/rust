@@ -21,7 +21,7 @@ use rustc_data_structures::fx::FxHashMap;
 
 use std::cell::RefCell;
 
-impl<'ll, 'tcx: 'll> BaseTypeMethods<'ll, 'tcx> for CrContext<'tcx> {
+impl<'ll, 'tcx: 'll> BaseTypeMethods<'ll, 'tcx> for CrContext<'ll, 'tcx> {
     fn type_void(&self) -> CrType  {
         unimplemented!()
     }
@@ -120,11 +120,11 @@ impl<'ll, 'tcx: 'll> BaseTypeMethods<'ll, 'tcx> for CrContext<'tcx> {
         unimplemented!()
     }
     fn tcx(&self) -> &TyCtxt<'ll, 'tcx, 'tcx> {
-        unimplemented!()
+        &self.tcx
     }
 }
 
-impl<'ll, 'tcx: 'll> LayoutTypeMethods<'ll, 'tcx> for CrContext<'tcx> {
+impl<'ll, 'tcx: 'll> LayoutTypeMethods<'ll, 'tcx> for CrContext<'ll, 'tcx> {
     fn backend_type(&self, _ty: &TyLayout<'tcx>) -> CrType {
         unimplemented!()
     }
@@ -159,19 +159,19 @@ impl<'ll, 'tcx: 'll> LayoutTypeMethods<'ll, 'tcx> for CrContext<'tcx> {
     }
 }
 
-impl<'a, 'tcx: 'a> HasDataLayout for &'a CrContext<'tcx> {
+impl<'a, 'll:'a, 'tcx: 'll> HasDataLayout for &'a CrContext<'ll, 'tcx> {
     fn data_layout(&self) -> &TargetDataLayout {
         &self.tcx().data_layout
     }
 }
 
-impl<'a, 'tcx: 'a> HasTyCtxt<'tcx> for &'a CrContext<'tcx> {
+impl<'a, 'll:'a, 'tcx: 'll> HasTyCtxt<'tcx> for &'a CrContext<'ll, 'tcx> {
     fn tcx<'b>(&'b self) -> TyCtxt<'b, 'tcx, 'tcx> {
         unimplemented!()
     }
 }
 
-impl<'a, 'tcx: 'a> LayoutOf for &'a CrContext<'tcx> {
+impl<'a, 'll:'a, 'tcx: 'll> LayoutOf for &'a CrContext<'ll, 'tcx> {
     type Ty = Ty<'tcx>;
     type TyLayout = TyLayout<'tcx>;
 
@@ -184,11 +184,11 @@ impl<'a, 'tcx: 'a> LayoutOf for &'a CrContext<'tcx> {
     }
 }
 
-impl<'a, 'll: 'a, 'tcx: 'll> DerivedTypeMethods<'a, 'll, 'tcx> for CrContext<'tcx> {}
+impl<'a, 'll: 'a, 'tcx: 'll> DerivedTypeMethods<'a, 'll, 'tcx> for CrContext<'ll, 'tcx> {}
 
-impl<'a, 'll: 'a, 'tcx: 'll> TypeMethods<'a, 'll, 'tcx> for CrContext<'tcx> {}
+impl<'a, 'll: 'a, 'tcx: 'll> TypeMethods<'a, 'll, 'tcx> for CrContext<'ll, 'tcx> {}
 
-impl<'a, 'll: 'a, 'tcx: 'll>  ArgTypeMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'tcx> {
+impl<'a, 'll: 'a, 'tcx: 'll>  ArgTypeMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'll, 'tcx> {
     fn store_fn_arg(
         &mut self,
         _ty: &ArgType<'tcx, Ty<'tcx>>,

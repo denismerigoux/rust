@@ -15,7 +15,7 @@ use super::context::{CrValue, CrType, CrContext};
 use syntax_pos::symbol::LocalInternedString;
 use rustc::mir::interpret::{Scalar, Allocation};
 
-impl<'ll, 'tcx: 'll> ConstMethods<'ll, 'tcx> for CrContext<'tcx> {
+impl<'ll, 'tcx: 'll> ConstMethods<'ll, 'tcx> for CrContext<'ll, 'tcx> {
     // Constant constructors
 
     fn const_null(&self, _t: CrType) -> CrValue {
