@@ -42,7 +42,8 @@ impl<'ll, 'tcx: 'll> DebugInfoMethods<'ll, 'tcx>  for CrContext<'ll, 'tcx> {
         _llfn: CrValue,
         _mir: &mir::Mir,
     ) -> FunctionDebugContext<Self::DIScope> {
-        unimplemented!()
+        //FIXME: replace this dummy impl
+        FunctionDebugContext::DebugInfoDisabled
     }
 
     fn create_mir_scopes(

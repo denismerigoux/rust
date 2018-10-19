@@ -10,13 +10,43 @@
 
 use rustc_target::abi::call::FnType;
 use rustc::ty::{FnSig, Ty, Instance};
+use rustc_target::abi::LayoutOf;
+pub use rustc_target::abi::call::*;
 use rustc_codegen_ssa::interfaces::*;
 use super::context::{CrContext, CrValue};
 use super::builder::CrBuilder;
 
+
 #[allow(unreachable_code, unused_variables)]
 impl<'ll, 'tcx: 'll> AbiMethods<'tcx> for CrContext<'ll, 'tcx> {
     fn new_fn_type(&self, sig: FnSig<'tcx>, _extra_args: &[Ty<'tcx>]) -> FnType<'tcx, Ty<'tcx>> {
+        //FIXME: improve this dummy impl
+        use rustc_target::spec::abi::Abi::*;
+        let args = sig.inputs().iter().map(|x| ArgType::new(self.layout_of(*x))).collect::<Vec<_>>();
+        let conv = match self.sess().target.target.adjust_abi(sig.abi) {
+            RustIntrinsic | PlatformIntrinsic |
+            Rust | RustCall => Conv::C,
+
+            // It's the ABI's job to select this, not ours.
+            System => bug!("system abi should be selected elsewhere"),
+
+            Stdcall => Conv::X86Stdcall,
+            Fastcall => Conv::X86Fastcall,
+            Vectorcall => Conv::X86VectorCall,
+            Thiscall => Conv::X86ThisCall,
+            C => Conv::C,
+            Unadjusted => Conv::C,
+            Win64 => Conv::X86_64Win64,
+            SysV64 => Conv::X86_64SysV,
+            Aapcs => Conv::ArmAapcs,
+            PtxKernel => Conv::PtxKernel,
+            Msp430Interrupt => Conv::Msp430Intr,
+            X86Interrupt => Conv::X86Intr,
+            AmdGpuKernel => Conv::AmdGpuKernel,
+
+            // These API constants ought to be more specific...
+            Cdecl => Conv::C,
+        };
         FnType {
             // /// The LLVM types of each argument.
             // pub args: Vec<ArgType<'a, Ty>>,
@@ -27,10 +57,10 @@ impl<'ll, 'tcx: 'll> AbiMethods<'tcx> for CrContext<'ll, 'tcx> {
             // pub variadic: bool,
             //
             // pub conv: Conv,
-            args: unimplemented!(),
-            ret: unimplemented!(),
+            args,
+            ret: ArgType::new(self.layout_of(sig.output())),
             variadic: sig.variadic,
-            conv: unimplemented!()
+            conv
         }
     }
     fn new_vtable(
