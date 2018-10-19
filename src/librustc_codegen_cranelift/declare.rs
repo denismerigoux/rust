@@ -8,11 +8,16 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use rustc::ty::{Ty, Instance};
+use rustc::ty::{self, Ty, Instance};
 use rustc_codegen_ssa::interfaces::*;
+use rustc_codegen_ssa::common::ty_fn_sig;
 use rustc::hir::def_id::DefId;
 use rustc::mir::mono::{Linkage, Visibility};
 use super::context::{CrContext, CrValue, CrType};
+use cranelift::prelude::codegen::ir::function::Function;
+use cranelift::prelude::{Signature, ExternalName};
+
+use std::cell::RefCell;
 
 impl<'ll, 'tcx: 'll> DeclareMethods<'ll, 'tcx> for CrContext<'ll, 'tcx> {
 
@@ -91,10 +96,21 @@ impl<'ll, 'tcx: 'll> PreDefineMethods<'ll, 'tcx> for CrContext<'ll, 'tcx> {
         instance: Instance<'tcx>,
         _linkage: Linkage,
         _visibility: Visibility,
-        _symbol_name: &str
+        symbol_name: &str
     ) {
         //FIXME: improve this dummy impl
-        let cr_instance = CrValue::Instance(self.cr_instances.borrow_mut().push(()));
+        let fn_ty = instance.ty(*self.tcx());
+        let sig_rustc = ty_fn_sig(self, fn_ty);
+        let sig_rustc = self.tcx().normalize_erasing_late_bound_regions(
+            ty::ParamEnv::reveal_all(),
+            &sig_rustc
+        );
+        let conv_cr = self.rustc_conv_to_cr(sig_rustc.abi);
+        let mut sig_cr = Signature::new(conv_cr);
+        sig_cr.params.extend(sig_rustc.inputs().iter().map(|x| self.rustc_ty_to_cr_abi_param(*x)));
+        sig_cr.returns.push(self.rustc_ty_to_cr_abi_param(sig_rustc.output()));
+        let fun = Function::with_name_signature(ExternalName::testcase(symbol_name), sig_cr);
+        let cr_instance = CrValue::Instance(self.cr_instances.borrow_mut().push(RefCell::new(fun)));
         self.instances.borrow_mut().insert(instance, cr_instance);
     }
 }

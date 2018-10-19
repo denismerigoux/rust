@@ -29,7 +29,9 @@ impl<'ll, 'tcx: 'll> IntrinsicDeclarationMethods<'ll> for CrContext<'ll, 'tcx> {
     }
 }
 
-impl<'a, 'll: 'a, 'tcx: 'll> IntrinsicCallMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'll, 'tcx> {
+impl<'a, 'll: 'a, 'tcx: 'll> IntrinsicCallMethods<'a, 'll, 'tcx>
+    for CrBuilder<'a, 'll, 'tcx>
+{
     /// Remember to add all intrinsics here, in librustc_typeck/check/mod.rs,
     /// and in libcore/intrinsics.rs; if you need access to any llvm intrinsics,
     /// add them to librustc_codegen_llvm/context.rs

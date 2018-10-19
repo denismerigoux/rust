@@ -11,11 +11,28 @@
 use rustc_target::abi::call::FnType;
 use rustc::ty::{FnSig, Ty, Instance};
 use rustc_target::abi::LayoutOf;
+use rustc_target::spec::abi::Abi;
 pub use rustc_target::abi::call::*;
 use rustc_codegen_ssa::interfaces::*;
 use super::context::{CrContext, CrValue};
 use super::builder::CrBuilder;
+use cranelift::prelude::{CallConv, AbiParam};
 
+impl<'ll, 'tcx: 'll> CrContext<'ll, 'tcx> {
+    pub(crate) fn rustc_conv_to_cr(&self, abi: Abi) -> CallConv {
+        //FIXME: improve this dummy impl
+        match abi {
+            Abi::Rust => CallConv::Fast,
+            _ => panic!()
+        }
+    }
+
+    pub(crate) fn rustc_ty_to_cr_abi_param(&self, ty: Ty<'tcx>) -> AbiParam {
+        //FIXME: improve this dummy impl
+        let ty_cr = self.rustc_ty_to_cr_ty(ty);
+        AbiParam::new(ty_cr)
+    }
+}
 
 #[allow(unreachable_code, unused_variables)]
 impl<'ll, 'tcx: 'll> AbiMethods<'tcx> for CrContext<'ll, 'tcx> {
@@ -75,7 +92,9 @@ impl<'ll, 'tcx: 'll> AbiMethods<'tcx> for CrContext<'ll, 'tcx> {
     }
 }
 
-impl<'a, 'll: 'a, 'tcx: 'll> AbiBuilderMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'll, 'tcx> {
+impl<'a, 'll: 'a, 'tcx: 'll> AbiBuilderMethods<'a, 'll, 'tcx>
+    for CrBuilder<'a, 'll, 'tcx>
+{
     fn apply_attrs_callsite(
         &mut self,
         _ty: &FnType<'tcx, Ty<'tcx>>,

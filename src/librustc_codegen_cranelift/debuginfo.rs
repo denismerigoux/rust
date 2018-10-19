@@ -70,7 +70,9 @@ impl<'ll, 'tcx: 'll> DebugInfoMethods<'ll, 'tcx>  for CrContext<'ll, 'tcx> {
 }
 
 
-impl<'a, 'll: 'a, 'tcx: 'll> DebugInfoBuilderMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'll, 'tcx> {
+impl<'a, 'll: 'a, 'tcx: 'll> DebugInfoBuilderMethods<'a, 'll, 'tcx>
+    for CrBuilder<'a, 'll, 'tcx>
+{
     fn declare_local(
         &mut self,
         _dbg_context: &FunctionDebugContext<DIScope>,

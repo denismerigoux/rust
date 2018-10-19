@@ -11,15 +11,34 @@
 use rustc_codegen_ssa::interfaces::*;
 use rustc_codegen_ssa::common::TypeKind;
 use rustc_codegen_ssa::mir::place::PlaceRef;
-use rustc::ty::{self, Ty, TyCtxt};
+use rustc::ty::{self, Ty, TyCtxt, TyKind, List};
 use rustc::ty::layout::{TyLayout, LayoutOf, LayoutError, HasTyCtxt, HasDataLayout,
     TargetDataLayout};
 use rustc_target::abi::call::{FnType, Reg, CastTarget, ArgType};
 use super::context::{CrContext, CrType, CrValue};
 use super::builder::CrBuilder;
 use rustc_data_structures::fx::FxHashMap;
+use cranelift::prelude as cr;
+use syntax::ast::IntTy;
 
 use std::cell::RefCell;
+
+impl<'ll, 'tcx: 'll> CrContext<'ll, 'tcx> {
+    pub(crate) fn pointer_size(&self) -> u16 {
+        self.tcx.data_layout.pointer_size.bits() as u16
+    }
+
+    pub(crate) fn rustc_ty_to_cr_ty(&self, ty: Ty) -> cr::Type {
+        //FIXME: improve this dummy impl
+        match ty.sty {
+            TyKind::Int(IntTy::Isize) => cr::Type::int(self.pointer_size()).unwrap(),
+            TyKind::RawPtr(_) => cr::Type::int(self.pointer_size()).unwrap(),
+            TyKind::Tuple(items) if items == List::empty() =>
+                cr::Type::int(self.pointer_size()).unwrap(),
+            _ => panic!()
+        }
+    }
+}
 
 impl<'ll, 'tcx: 'll> BaseTypeMethods<'ll, 'tcx> for CrContext<'ll, 'tcx> {
     fn type_void(&self) -> CrType  {

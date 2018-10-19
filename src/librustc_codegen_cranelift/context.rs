@@ -10,7 +10,10 @@
 
 use rustc_codegen_ssa::interfaces::*;
 use cranelift;
+use cranelift::prelude::FunctionBuilderContext;
+use cranelift::prelude::codegen::Context;
 use cranelift::prelude::codegen::entity::{PrimaryMap, EntityRef};
+use cranelift::prelude::codegen::ir::function::Function;
 use write::CrModule;
 use rustc::ty::{TyCtxt, Instance};
 use rustc::mir::mono::{CodegenUnit, Stats};
@@ -20,9 +23,12 @@ use std::sync::Arc;
 use std::cell::RefCell;
 
 pub struct CrContext<'ll, 'tcx: 'll> {
+    pub crcx: Context,
+    pub fx_crcx: RefCell<FunctionBuilderContext>,
+    pub current_instance: RefCell<Option<CrInstance>>,
     pub tcx : TyCtxt<'ll, 'tcx, 'tcx>,
     pub codegen_unit: Arc<CodegenUnit<'tcx>>,
-    pub cr_instances: RefCell<PrimaryMap<CrInstance, ()>>,
+    pub cr_instances: RefCell<PrimaryMap<CrInstance, RefCell<Function>>>,
     pub instances: RefCell<FxHashMap<Instance<'tcx>, CrValue>>,
     pub stats: RefCell<Stats>
 }
@@ -34,8 +40,11 @@ impl<'ll, 'tcx: 'll> CrContext<'ll, 'tcx> {
         _cranelift_module: &CrModule
     ) -> Self {
             CrContext {
+                crcx: Context::new(),
+                fx_crcx: RefCell::new(FunctionBuilderContext::new()),
                 tcx,
                 codegen_unit: cgu,
+                current_instance: RefCell::new(None),
                 cr_instances: RefCell::new(PrimaryMap::new()),
                 instances: RefCell::new(FxHashMap()),
                 stats: RefCell::new(Stats::default())

@@ -26,7 +26,7 @@ use std::ops::Range;
 
 #[allow(dead_code)]
 pub struct CrBuilder<'a, 'll: 'a, 'tcx: 'll> {
-    cx: &'a CrContext<'ll, 'tcx>
+    cx: &'a CrContext<'ll, 'tcx>,
 }
 
 impl<'a, 'll: 'a, 'tcx: 'll> HasCodegen<'a, 'll, 'tcx> for CrBuilder<'a, 'll, 'tcx> {
@@ -36,16 +36,16 @@ impl<'a, 'll: 'a, 'tcx: 'll> HasCodegen<'a, 'll, 'tcx> for CrBuilder<'a, 'll, 't
 
 impl<'a, 'll :'a, 'tcx: 'll> BuilderMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'll, 'tcx> {
     fn new_block<'b>(
-        _cx: &'a CrContext,
-        _llfn: CrValue,
+        _cx: &'a CrContext<'ll, 'tcx>,
+        _crfn: CrValue,
         _name: &'b str
     ) -> Self {
         unimplemented!()
     }
-    fn with_cx(_cx: &'a CrContext) -> Self {
+    fn with_cx(_cx: &'a CrContext<'ll, 'tcx>) -> Self {
         unimplemented!()
     }
-    fn build_sibling_block<'b>(&self, _name: &'b str) -> Self {
+    fn build_sibling_block<'c>(&self, _name: &'c str) -> Self {
         unimplemented!()
     }
     fn cx(&self) -> &'a CrContext<'ll, 'tcx> {
@@ -830,12 +830,12 @@ impl<'a, 'll :'a, 'tcx: 'll> BuilderMethods<'a, 'll, 'tcx> for CrBuilder<'a, 'll
     }
 
     /// Returns the args that should be used for a call to `llfn`.
-    fn check_call<'b>(
+    fn check_call<'c>(
         &mut self,
         _typ: &str,
         _llfn: CrValue,
-        _args: &'b [CrValue]
-    ) -> Cow<'b, [CrValue]>
+        _args: &'c [CrValue]
+    ) -> Cow<'c, [CrValue]>
         where [CrValue] : ToOwned {
         unimplemented!()
     }
