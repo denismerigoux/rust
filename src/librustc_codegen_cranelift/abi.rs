@@ -39,7 +39,9 @@ impl<'ll, 'tcx: 'll> AbiMethods<'tcx> for CrContext<'ll, 'tcx> {
     fn new_fn_type(&self, sig: FnSig<'tcx>, _extra_args: &[Ty<'tcx>]) -> FnType<'tcx, Ty<'tcx>> {
         //FIXME: improve this dummy impl
         use rustc_target::spec::abi::Abi::*;
-        let args = sig.inputs().iter().map(|x| ArgType::new(self.layout_of(*x))).collect::<Vec<_>>();
+        let args = sig.inputs().iter().map(
+            |x| ArgType::new(self.layout_of(*x))
+        ).collect::<Vec<_>>();
         let conv = match self.sess().target.target.adjust_abi(sig.abi) {
             RustIntrinsic | PlatformIntrinsic |
             Rust | RustCall => Conv::C,

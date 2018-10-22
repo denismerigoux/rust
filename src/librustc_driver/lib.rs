@@ -55,7 +55,7 @@ extern crate rustc_save_analysis;
 extern crate rustc_traits;
 extern crate rustc_codegen_utils;
 extern crate rustc_codegen_ssa;
-extern crate rustc_codegen_cranelift;
+// extern crate rustc_codegen_cranelift; // FIXME: uncomment to enable the Cranelift backend
 extern crate rustc_typeck;
 extern crate scoped_tls;
 extern crate serialize;
@@ -87,7 +87,8 @@ use rustc_metadata::cstore::CStore;
 use rustc_metadata::dynamic_lib::DynamicLibrary;
 use rustc::util::common::{time, ErrorReported};
 use rustc_codegen_utils::codegen_backend::CodegenBackend;
-use rustc_codegen_cranelift::CraneliftCodegenBackend;
+// FIXME: uncomment to enable the Cranelift backend
+// use rustc_codegen_cranelift::CraneliftCodegenBackend;
 
 use serialize::json::ToJson;
 
@@ -255,9 +256,10 @@ pub fn get_codegen_backend(sess: &Session) -> Box<dyn CodegenBackend> {
             "metadata_only" => {
                 rustc_codegen_utils::codegen_backend::MetadataOnlyCodegenBackend::new
             }
-            "cranelift" => {
-                CraneliftCodegenBackend::new
-            }
+            // FIXME: uncomment to enable the Cranelift backend
+            // "cranelift" => {
+            //     CraneliftCodegenBackend::new
+            // }
             filename if filename.contains(".") => {
                 load_backend_from_dylib(filename.as_ref())
             }
