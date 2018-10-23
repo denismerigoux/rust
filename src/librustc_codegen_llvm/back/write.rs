@@ -486,7 +486,7 @@ pub(crate) unsafe fn codegen(cgcx: &CodegenContext<LlvmCodegenBackend>,
         // [1]: https://bugs.llvm.org/show_bug.cgi?id=37358
         // [2]: https://github.com/rust-lang/rust/issues/50154
         llvm::LLVMRustDemoteSimdArguments(llmod);
-        cgcx.save_temp_bitcode(&module, "simd-demoted");
+        save_temp_bitcode(cgcx, &module, "simd-demoted");
 
         // A codegen-specific pass manager is used to generate object
         // files for an LLVM module.

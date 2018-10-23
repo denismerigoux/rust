@@ -896,7 +896,7 @@ fn start_executing_work<B : ExtraBackendMethods>(
 
     // Compute the set of symbols we need to retain when doing LTO (if we need to)
     let exported_symbols = {
-        let mut exported_symbols = FxHashMap();
+        let mut exported_symbols = FxHashMap::default();
 
         let copy_symbols = |cnum| {
             let symbols = tcx.exported_symbols(cnum)

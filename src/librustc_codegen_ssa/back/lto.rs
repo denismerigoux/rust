@@ -86,8 +86,7 @@ impl<B : WriteBackendMethods> LtoModuleCodegen<B>
                 let module = module.take().unwrap();
                 {
                     let config = cgcx.config(module.kind);
-                    let llmod = &module.module_llvm;
-                    B::run_lto_pass_manager(cgcx, llmod, config, false);
+                    B::run_lto_pass_manager(cgcx, &module, config, false);
                     timeline.record("fat-done");
                 }
                 Ok(module)

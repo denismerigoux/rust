@@ -63,7 +63,7 @@ pub trait WriteBackendMethods : 'static + Sized + Clone {
     ) -> Result<CompiledModule, FatalError>;
     fn run_lto_pass_manager(
         cgcx: &CodegenContext<Self>,
-        llmod: &Self::Module,
+        llmod: &ModuleCodegen<Self::Module>,
         config: &ModuleConfig,
         thin: bool
     );
